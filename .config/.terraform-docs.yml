@@ -1,0 +1,4 @@
+formatter: "markdown"
+
+header-from: ./.config/header.md
+footer-from: ./.config/footer.md

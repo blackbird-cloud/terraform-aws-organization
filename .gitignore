@@ -1,0 +1,11 @@
+.terraform/
+.terraform.lock.hcl
+*.tfstate
+nocommit/
+*.lock.info
+*.backup
+.idea
+*.sw*
+.DS_Store
+.terragrunt-cache
+modules/**/backend.tf # To prevent Terragrunt from conflicting with other, auto-generated backends
