@@ -31,8 +31,15 @@ locals {
       ]
     ]
   ])
-  ous                      = merge(aws_organizations_organizational_unit.level_one, aws_organizations_organizational_unit.level_two, aws_organizations_organizational_unit.level_three)
-  delegated_administrators = flatten(compact([for account in var.accounts : try(account.delegated_administrator_services, "") != "" ? [for service_principal in account.delegated_administrator_services : merge(account, { service_principal : service_principal })] : null]))
+
+  ous = merge(aws_organizations_organizational_unit.level_one, aws_organizations_organizational_unit.level_two, aws_organizations_organizational_unit.level_three)
+
+  delegated_administrators = flatten([
+    for account in var.accounts : [
+      for service in account.delegated_administrator_services : { service_principal : service, account_name : account.name }
+    ]
+  ])
+
   organizations_policy_attachments = flatten([
     for name, policy in var.organizations_policies : [
       for ou in policy.ous : {
@@ -69,17 +76,18 @@ resource "aws_organizations_account" "default" {
   }
   name                       = each.key
   email                      = each.value.email
-  close_on_deletion          = try(each.value.close_on_deletion)
-  iam_user_access_to_billing = try(each.value.iam_user_access_to_billing)
-  parent_id                  = try(each.value.ou_name)
+  close_on_deletion          = try(each.value.close_on_deletion, null)
+  iam_user_access_to_billing = try(each.value.iam_user_access_to_billing, null)
+  parent_id                  = try(each.value.ou_name, "") != "" ? local.ous[each.value.ou_name].id : null
   tags                       = var.tags
 }
 
 resource "aws_organizations_delegated_administrator" "default" {
   for_each = {
-    for account in local.delegated_administrators : account.name => account
+    for account in local.delegated_administrators : account.service_principal => account
   }
-  account_id        = aws_organizations_account.default[each.key]
+
+  account_id        = aws_organizations_account.default[each.value.account_name].id
   service_principal = each.value.service_principal
 }
 

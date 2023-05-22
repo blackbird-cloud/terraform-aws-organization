@@ -17,3 +17,8 @@ output "organizations_policies" {
   value       = aws_organizations_policy.default
   description = "The created Organization policies."
 }
+
+output "organizations_delegated_administrator" {
+  value       = aws_organizations_delegated_administrator.default
+  description = "The AWS Organization delegated administrator assignments."
+}
