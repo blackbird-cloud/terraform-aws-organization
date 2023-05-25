@@ -48,6 +48,8 @@ locals {
       }
     ]
   ])
+  security_hub_account_admin_name = compact([for account in local.delegated_administrators : account.service_principal == "securityhub.amazonaws.com" ? account.account_name : ""])[0]
+  security_hub_account_admin_id   = local.security_hub_account_admin_name != "" ? aws_organizations_account.default[local.security_hub_account_admin_name].id : ""
 }
 
 resource "aws_organizations_organizational_unit" "level_two" {
@@ -109,4 +111,11 @@ resource "aws_organizations_policy_attachment" "default" {
 
   policy_id = each.value.policy_id
   target_id = each.value.target_id
+}
+
+### Securityhub organization settings
+resource "aws_securityhub_organization_admin_account" "default" {
+  count = local.security_hub_account_admin_id != "" ? 1 : 0
+
+  admin_account_id = local.security_hub_account_admin_id
 }
