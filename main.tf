@@ -80,6 +80,7 @@ resource "aws_organizations_account" "default" {
   iam_user_access_to_billing = try(each.value.iam_user_access_to_billing, null)
   parent_id                  = try(each.value.ou_name, "") != "" ? local.ous[each.value.ou_name].id : null
   tags                       = var.tags
+  depends_on                 = [aws_organizations_organization.default]
 }
 
 resource "aws_organizations_delegated_administrator" "default" {
@@ -100,6 +101,7 @@ resource "aws_organizations_policy" "default" {
   skip_destroy = try(each.value.skip_destroy, null)
   type         = try(each.value.skip_destroy, "SERVICE_CONTROL_POLICY")
   tags         = var.tags
+  depends_on   = [aws_organizations_organization.default]
 }
 
 resource "aws_organizations_policy_attachment" "default" {
@@ -107,8 +109,9 @@ resource "aws_organizations_policy_attachment" "default" {
     for attachment in local.organizations_policy_attachments : "${attachment.policy_id}-${attachment.target_id}" => attachment
   }
 
-  policy_id = each.value.policy_id
-  target_id = each.value.target_id
+  policy_id  = each.value.policy_id
+  target_id  = each.value.target_id
+  depends_on = [aws_organizations_organization.default]
 }
 
 ### Securityhub organization settings
@@ -116,4 +119,13 @@ resource "aws_securityhub_organization_admin_account" "default" {
   count = aws_organizations_delegated_administrator.default["securityhub.amazonaws.com"] ? 1 : 0
 
   admin_account_id = aws_organizations_delegated_administrator.default["securityhub.amazonaws.com"].account_id
+  depends_on       = [aws_organizations_organization.default]
+}
+
+### GuardDuty organization settings
+resource "aws_guardduty_organization_admin_account" "default" {
+  count = aws_organizations_delegated_administrator.default["guardduty.amazonaws.com"] ? 1 : 0
+
+  admin_account_id = aws_organizations_delegated_administrator.default["guardduty.amazonaws.com"].account_id
+  depends_on       = [aws_organizations_organization.default]
 }
