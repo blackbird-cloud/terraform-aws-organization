@@ -112,12 +112,8 @@ resource "aws_organizations_policy_attachment" "default" {
 }
 
 ### Securityhub organization settings
-data "aws_organizations_delegated_administrators" "securityhub" {
-  service_principal = "securityhub.amazonaws.com"
-}
-
 resource "aws_securityhub_organization_admin_account" "default" {
-  count = length(data.aws_organizations_delegated_administrators.securityhub.delegated_administrators) > 0 ? 1 : 0
+  count = aws_organizations_delegated_administrator.default["securityhub.amazonaws.com"] ? 1 : 0
 
-  admin_account_id = tolist(data.aws_organizations_delegated_administrators.securityhub.delegated_administrators)[0].id
+  admin_account_id = aws_organizations_delegated_administrator.default["securityhub.amazonaws.com"].account_id
 }
