@@ -114,18 +114,130 @@ resource "aws_organizations_policy_attachment" "default" {
   depends_on = [aws_organizations_organization.default]
 }
 
+### Account Management
+resource "aws_account_primary_contact" "root" {
+  address_line_1     = try(var.primary_contact.address_line_1, null)
+  address_line_2     = try(var.primary_contact.address_line_2, null)
+  address_line_3     = try(var.primary_contact.address_line_3, null)
+  city               = try(var.primary_contact.city, null)
+  company_name       = try(var.primary_contact.company_name, null)
+  country_code       = try(var.primary_contact.country_code, null)
+  district_or_county = try(var.primary_contact.district_or_county, null)
+  full_name          = try(var.primary_contact.full_name, null)
+  phone_number       = try(var.primary_contact.phone_number, null)
+  postal_code        = try(var.primary_contact.postal_code, null)
+  state_or_region    = try(var.primary_contact.state_or_region, null)
+  website_url        = try(var.primary_contact.website_url, null)
+}
+
+resource "aws_account_alternate_contact" "root_operations" {
+  alternate_contact_type = "OPERATIONS"
+
+  name          = try(var.operations_contact.name, var.primary_contact.full_name)
+  title         = var.operations_contact.title
+  email_address = var.operations_contact.email_address
+  phone_number  = try(var.operations_contact.phone_number, var.primary_contact.phone_number)
+}
+
+resource "aws_account_alternate_contact" "root_billing" {
+  alternate_contact_type = "BILLING"
+
+  name          = try(var.billing_contact.name, var.primary_contact.full_name)
+  title         = var.billing_contact.title
+  email_address = var.billing_contact.email_address
+  phone_number  = try(var.billing_contact.phone_number, var.primary_contact.phone_number)
+}
+
+resource "aws_account_alternate_contact" "root_security" {
+  alternate_contact_type = "SECURITY"
+
+  name          = try(var.security_contact.name, var.primary_contact.full_name)
+  title         = var.security_contact.title
+  email_address = var.security_contact.email_address
+  phone_number  = try(var.security_contact.phone_number, var.primary_contact.phone_number)
+}
+
+### Child Account Management
+resource "aws_account_primary_contact" "child" {
+  for_each = {
+    for account in var.accounts : account.name => account
+  }
+
+  account_id         = aws_organizations_account.default[each.key].id
+  address_line_1     = var.primary_contact.address_line_1
+  address_line_2     = try(var.primary_contact.address_line_2, null)
+  address_line_3     = try(var.primary_contact.address_line_3, null)
+  city               = var.primary_contact.city
+  company_name       = try(var.primary_contact.company_name, null)
+  country_code       = var.primary_contact.country_code
+  district_or_county = try(var.primary_contact.district_or_county, null)
+  full_name          = var.primary_contact.full_name
+  phone_number       = var.primary_contact.phone_number
+  postal_code        = var.primary_contact.postal_code
+  state_or_region    = try(var.primary_contact.state_or_region, null)
+  website_url        = try(var.primary_contact.website_url, null)
+}
+
+resource "aws_account_alternate_contact" "child_operations" {
+  for_each = {
+    for account in var.accounts : account.name => account
+  }
+
+  account_id             = aws_organizations_account.default[each.key].id
+  alternate_contact_type = "OPERATIONS"
+
+  name          = try(var.operations_contact.name, var.primary_contact.full_name)
+  title         = var.operations_contact.title
+  email_address = var.operations_contact.email_address
+  phone_number  = try(var.operations_contact.phone_number, var.primary_contact.phone_number)
+}
+
+resource "aws_account_alternate_contact" "child_billing" {
+  for_each = {
+    for account in var.accounts : account.name => account
+  }
+
+  account_id             = aws_organizations_account.default[each.key].id
+  alternate_contact_type = "BILLING"
+
+  name          = try(var.billing_contact.name, var.primary_contact.full_name)
+  title         = var.billing_contact.title
+  email_address = var.billing_contact.email_address
+  phone_number  = try(var.billing_contact.phone_number, var.primary_contact.phone_number)
+}
+
+resource "aws_account_alternate_contact" "child_security" {
+  for_each = {
+    for account in var.accounts : account.name => account
+  }
+
+  account_id             = aws_organizations_account.default[each.key].id
+  alternate_contact_type = "SECURITY"
+
+  name          = try(var.security_contact.name, var.primary_contact.full_name)
+  title         = var.security_contact.title
+  email_address = var.security_contact.email_address
+  phone_number  = try(var.security_contact.phone_number, var.primary_contact.phone_number)
+}
+
+
 ### Securityhub organization settings
 resource "aws_securityhub_organization_admin_account" "default" {
-  count = aws_organizations_delegated_administrator.default["securityhub.amazonaws.com"] ? 1 : 0
+  count = try(aws_organizations_delegated_administrator.default["securityhub.amazonaws.com"], "") != "" ? 1 : 0
 
   admin_account_id = aws_organizations_delegated_administrator.default["securityhub.amazonaws.com"].account_id
   depends_on       = [aws_organizations_organization.default]
 }
 
+
 ### GuardDuty organization settings
+resource "aws_guardduty_detector" "default" {
+  count = try(aws_organizations_delegated_administrator.default["guardduty.amazonaws.com"], "") != "" ? 1 : 0
+}
+
 resource "aws_guardduty_organization_admin_account" "default" {
-  count = aws_organizations_delegated_administrator.default["guardduty.amazonaws.com"] ? 1 : 0
+  count = try(aws_organizations_delegated_administrator.default["guardduty.amazonaws.com"], "") != "" ? 1 : 0
 
   admin_account_id = aws_organizations_delegated_administrator.default["guardduty.amazonaws.com"].account_id
-  depends_on       = [aws_organizations_organization.default]
+  depends_on       = [aws_organizations_organization.default, aws_guardduty_detector.default[0]]
 }

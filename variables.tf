@@ -35,3 +35,23 @@ variable "accounts" {
   default     = []
   description = "List of AWS accounts to create, name,email, close_on_deletion, iam_user_access_to_billing, ou_name, and delegated_administrator_services are the configurable options."
 }
+
+variable "primary_contact" {
+  type        = any
+  description = "address_line_1 - (Required) The first line of the primary contact address. address_line_2 - (Optional) The second line of the primary contact address, if any. address_line_3 - (Optional) The third line of the primary contact address, if any. city - (Required) The city of the primary contact address. company_name - (Optional) The name of the company associated with the primary contact information, if any. country_code - (Required) The ISO-3166 two-letter country code for the primary contact address. district_or_county - (Optional) The district or county of the primary contact address, if any. full_name - (Required) The full name of the primary contact address. phone_number - (Required) The phone number of the primary contact information. The number will be validated and, in some countries, checked for activation. postal_code - (Required) The postal code of the primary contact address. state_or_region - (Optional) The state or region of the primary contact address. This field is required in selected countries. website_url - (Optional) The URL of the website associated with the primary contact information, if any."
+}
+
+variable "billing_contact" {
+  type        = any
+  description = "email_address - (Required) An email address for the alternate contact. name - (Required) Name of the alternate contact. phone_number - (Required) Phone number for the alternate contact. title - (Required) Title for the alternate contact."
+}
+
+variable "security_contact" {
+  type        = any
+  description = "email_address - (Required) An email address for the alternate contact. name - (Required) Name of the alternate contact. phone_number - (Required) Phone number for the alternate contact. title - (Required) Title for the alternate contact."
+}
+
+variable "operations_contact" {
+  type        = any
+  description = "email_address - (Required) An email address for the alternate contact. name - (Required) Name of the alternate contact. phone_number - (Required) Phone number for the alternate contact. title - (Required) Title for the alternate contact."
+}
