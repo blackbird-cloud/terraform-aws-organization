@@ -5,28 +5,41 @@ resource "aws_organizations_organization" "default" {
 }
 
 resource "aws_organizations_organizational_unit" "level_one" {
-  for_each = var.organizational_units
-
-  name      = each.key
+  for_each = {
+    for ou in var.organizational_units : ou.name => ou
+  }
+  name      = each.value.name
   parent_id = aws_organizations_organization.default.roots[0].id
-  tags      = var.tags
+  tags      = merge(var.tags, each.value.tags)
 }
 
 locals {
+  level_one_accounts = flatten([
+    for level_one_ou in var.organizational_units : [for account in try(level_one_ou.accounts, []) : merge(account, { parent_id : aws_organizations_organizational_unit.level_one[level_one_ou.name].id })]
+  ])
+  level_two_accounts = flatten([
+    for level_two_ou in local.level_two_ous : [for account in try(level_two_ou.accounts, []) : merge(account, { parent_id : aws_organizations_organizational_unit.level_two[level_two_ou.key].id })]
+  ])
+  level_three_accounts = flatten([
+    for level_three_ou in local.level_three_ous : [for account in try(level_three_ou.accounts, []) : merge(account, { parent_id : level_three_ou.parent_id })]
+  ])
+  accounts = concat(local.level_one_accounts, local.level_two_accounts, local.level_three_accounts)
   level_two_ous = flatten([
-    for ou, level_two_children in var.organizational_units : [
-      for level_two_ou, level_three_children in level_two_children : {
+    for level_one_ou in var.organizational_units : [
+      for level_two_ou in try(level_one_ou.organizational_units, []) : {
         ou : level_two_ou
-        parent_id : aws_organizations_organizational_unit.level_one[ou].id
+        key : "${level_one_ou.name}-${level_two_ou.name}"
+        parent_id : aws_organizations_organizational_unit.level_one[level_one_ou.name].id
       }
     ]
   ])
   level_three_ous = flatten([
-    for ou, level_two_children in var.organizational_units : [
-      for level_two_ou, level_three_children in level_two_children : [
-        for level_three_ou, level_four_children in level_three_children : {
+    for level_one_ou in var.organizational_units : [
+      for level_two_ou in try(level_one_ou.organizational_units, []) : [
+        for level_three_ou in try(level_two_ou.organizational_units, []) : {
           ou : level_three_ou
-          parent_id : aws_organizations_organizational_unit.level_two[level_two_ou].id
+          key : "${level_one_ou.name}-${level_two_ou.name}-${level_three_ou.name}"
+          parent_id : aws_organizations_organizational_unit.level_two["${level_one_ou.name}-${level_two_ou.name}"].id
         }
       ]
     ]
@@ -35,7 +48,7 @@ locals {
   ous = merge(aws_organizations_organizational_unit.level_one, aws_organizations_organizational_unit.level_two, aws_organizations_organizational_unit.level_three)
 
   delegated_administrators = flatten([
-    for account in var.accounts : [
+    for account in local.accounts : [
       for service in account.delegated_administrator_services : { service_principal : service, account_name : account.name }
     ]
   ])
@@ -52,34 +65,35 @@ locals {
 
 resource "aws_organizations_organizational_unit" "level_two" {
   for_each = {
-    for ou in local.level_two_ous : ou.ou => ou
+    for ou in local.level_two_ous : ou.key => ou
   }
 
-  name      = each.key
+  name      = each.value.ou.name
   parent_id = each.value.parent_id
-  tags      = var.tags
+  tags      = merge(var.tags, each.value.ou.tags)
 }
 
 resource "aws_organizations_organizational_unit" "level_three" {
   for_each = {
-    for ou in local.level_three_ous : ou.ou => ou
+    for ou in local.level_three_ous : ou.key => ou
   }
 
-  name      = each.key
+  name      = each.value.ou.name
   parent_id = each.value.parent_id
-  tags      = var.tags
+  tags      = merge(var.tags, each.value.ou.tags)
 }
 
 resource "aws_organizations_account" "default" {
   for_each = {
-    for account in var.accounts : account.name => account
+    for account in local.accounts : account.name => account
   }
-  name                       = each.key
+
+  name                       = each.value.name
   email                      = each.value.email
   close_on_deletion          = try(each.value.close_on_deletion, null)
   iam_user_access_to_billing = try(each.value.iam_user_access_to_billing, null)
-  parent_id                  = try(each.value.ou_name, "") != "" ? local.ous[each.value.ou_name].id : null
-  tags                       = var.tags
+  parent_id                  = each.value.parent_id
+  tags                       = merge(var.tags, try(each.value.tags, {}))
   depends_on                 = [aws_organizations_organization.default]
 }
 
@@ -160,7 +174,7 @@ resource "aws_account_alternate_contact" "root_security" {
 ### Child Account Management
 resource "aws_account_primary_contact" "child" {
   for_each = {
-    for account in var.accounts : account.name => account
+    for account in local.accounts : account.name => account
   }
 
   account_id         = aws_organizations_account.default[each.key].id
@@ -180,7 +194,7 @@ resource "aws_account_primary_contact" "child" {
 
 resource "aws_account_alternate_contact" "child_operations" {
   for_each = {
-    for account in var.accounts : account.name => account
+    for account in local.accounts : account.name => account
   }
 
   account_id             = aws_organizations_account.default[each.key].id
@@ -194,7 +208,7 @@ resource "aws_account_alternate_contact" "child_operations" {
 
 resource "aws_account_alternate_contact" "child_billing" {
   for_each = {
-    for account in var.accounts : account.name => account
+    for account in local.accounts : account.name => account
   }
 
   account_id             = aws_organizations_account.default[each.key].id
@@ -208,7 +222,7 @@ resource "aws_account_alternate_contact" "child_billing" {
 
 resource "aws_account_alternate_contact" "child_security" {
   for_each = {
-    for account in var.accounts : account.name => account
+    for account in local.accounts : account.name => account
   }
 
   account_id             = aws_organizations_account.default[each.key].id

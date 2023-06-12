@@ -14,8 +14,23 @@ variable "feature_set" {
 }
 
 variable "organizational_units" {
-  type        = map(any)
-  description = "Tree of Organization Units, supporting three levels deep. { ou1 :{ ou2: {ou3: {} }} }"
+  type        = list(any)
+  description = <<EOF
+List of Organizational units configuration, plus sub accounts. Organizational units can be nested 3 levels deep.
+`[{
+    name = string
+    accounts: [{
+        name = string,
+        email = string,
+        close_on_deletion = bool,
+        iam_user_access_to_billing= bool,
+        delegated_administrator_services = list(string)
+        tags = map(string)
+    }]
+    organizational_units: list(ou)
+    tags : map(string)
+}]`
+EOF
 }
 
 variable "tags" {
@@ -30,11 +45,11 @@ variable "organizations_policies" {
   description = "Map of policies to attach to your organization. Key will be used as policy name, provide the stringified JSON at at the key `content` in the value of the map."
 }
 
-variable "accounts" {
-  type        = list(any)
-  default     = []
-  description = "List of AWS accounts to create, name,email, close_on_deletion, iam_user_access_to_billing, ou_name, and delegated_administrator_services are the configurable options."
-}
+# variable "accounts" {
+#   type        = list(any)
+#   default     = []
+#   description = "List of AWS accounts to create, name,email, close_on_deletion, iam_user_access_to_billing, ou_name, and delegated_administrator_services are the configurable options."
+# }
 
 variable "primary_contact" {
   type        = any
