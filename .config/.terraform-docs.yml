@@ -5,6 +5,9 @@ footer-from: ./.config/footer.md
 
 output:
   file: ./README.md
+  mode: replace
+  template: |-
+    {{ .Content }}
 
 sections:
   hide:
@@ -12,7 +15,7 @@ sections:
 
 content: |-
   # AWS Organizations Terraform module
-  A Terraform module which configures your AWS Organization and creates AWS accounts. Read [this](https://docs.aws.amazon.com/organizations/index.html)] page for more information, and for a secure reference architecture by AWS, read [this](https://docs.aws.amazon.com/prescriptive-guidance/latest/security-reference-architecture/welcome.html) page.
+  A Terraform module which configures your AWS Organization and creates AWS accounts. Read [this](https://docs.aws.amazon.com/organizations/index.html) page for more information, and for a secure reference architecture by AWS, read [this](https://docs.aws.amazon.com/prescriptive-guidance/latest/security-reference-architecture/welcome.html) page.
 
   {{ .Header }}
 
