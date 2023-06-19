@@ -2,3 +2,33 @@ formatter: "markdown"
 
 header-from: ./.config/header.md
 footer-from: ./.config/footer.md
+
+output:
+  file: ./README.md
+
+sections:
+  hide:
+    - modules
+
+content: |-
+  # AWS Organizations Terraform module
+  A Terraform module which configures your AWS Organization and creates AWS accounts. Read [this](https://docs.aws.amazon.com/organizations/index.html)] page for more information, and for a secure reference architecture by AWS, read [this](https://docs.aws.amazon.com/prescriptive-guidance/latest/security-reference-architecture/welcome.html) page.
+
+  {{ .Header }}
+
+  ## Example
+  ```hcl
+  {{ include "./example/main.tf" }}
+  ```
+
+  {{ .Requirements }}
+
+  {{ .Providers }}
+
+  {{ .Resources }}
+
+  {{ .Inputs }}
+
+  {{ .Outputs }}
+
+  {{ .Footer }}
