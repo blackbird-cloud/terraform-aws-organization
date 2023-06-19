@@ -53,6 +53,12 @@ locals {
     ]
   ])
 
+  delegated_service_principals = flatten([
+    for account in local.accounts : [
+      for service in account.delegated_administrator_services : service
+    ]
+  ])
+
   organizations_policy_attachments = flatten([
     for name, policy in var.organizations_policies : [
       for ou in policy.ous : {
@@ -237,7 +243,7 @@ resource "aws_account_alternate_contact" "child_security" {
 
 ### Securityhub organization settings
 resource "aws_securityhub_organization_admin_account" "default" {
-  count = try(aws_organizations_delegated_administrator.default["securityhub.amazonaws.com"], "") != "" ? 1 : 0
+  count = contains(local.delegated_service_principals, "securityhub.amazonaws.com") ? 1 : 0
 
   admin_account_id = aws_organizations_delegated_administrator.default["securityhub.amazonaws.com"].account_id
   depends_on       = [aws_organizations_organization.default]
@@ -246,11 +252,11 @@ resource "aws_securityhub_organization_admin_account" "default" {
 
 ### GuardDuty organization settings
 resource "aws_guardduty_detector" "default" {
-  count = try(aws_organizations_delegated_administrator.default["guardduty.amazonaws.com"], "") != "" ? 1 : 0
+  count = contains(local.delegated_service_principals, "guardduty.amazonaws.com") != "" ? 1 : 0
 }
 
 resource "aws_guardduty_organization_admin_account" "default" {
-  count = try(aws_organizations_delegated_administrator.default["guardduty.amazonaws.com"], "") != "" ? 1 : 0
+  count = contains(local.delegated_service_principals, "guardduty.amazonaws.com") != "" ? 1 : 0
 
   admin_account_id = aws_organizations_delegated_administrator.default["guardduty.amazonaws.com"].account_id
   depends_on       = [aws_organizations_organization.default, aws_guardduty_detector.default[0]]
