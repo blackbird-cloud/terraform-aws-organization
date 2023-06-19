@@ -1,7 +1,6 @@
 module "organization" {
-  source = "../"
-  #   source  = "blackbird-cloud/organization/aws"
-  #   version = "~> 2"
+  source  = "blackbird-cloud/organization/aws"
+  version = "~> 2"
 
   aws_service_access_principals = [
     "sso.amazonaws.com",

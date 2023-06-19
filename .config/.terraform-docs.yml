@@ -5,6 +5,9 @@ footer-from: ./.config/footer.md
 
 output:
   file: ./README.md
+  mode: replace
+  template: |-
+    {{ .Content }}
 
 sections:
   hide:
