@@ -1,4 +1,3 @@
-<!-- BEGIN_TF_DOCS -->
 # AWS Organizations Terraform module
 A Terraform module which configures your AWS Organization and creates AWS accounts. Read [this](https://docs.aws.amazon.com/organizations/index.html) page for more information, and for a secure reference architecture by AWS, read [this](https://docs.aws.amazon.com/prescriptive-guidance/latest/security-reference-architecture/welcome.html) page.
 
@@ -101,8 +100,6 @@ module "organization" {
   organizations_policies = {}
   # https://docs.aws.amazon.com/organizations/latest/userguide/orgs_integrate_services_list.html
 
-  #   securityhub_auto_enable = true
-
   primary_contact = {
     address_line_1  = "My address"
     address_line_2  = "My office unit"
@@ -150,7 +147,7 @@ module "organization" {
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | ~> 5 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 5.4.0 |
 
 ## Resources
 
@@ -166,6 +163,7 @@ module "organization" {
 | [aws_account_primary_contact.root](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/account_primary_contact) | resource |
 | [aws_guardduty_detector.default](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/guardduty_detector) | resource |
 | [aws_guardduty_organization_admin_account.default](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/guardduty_organization_admin_account) | resource |
+| [aws_inspector2_delegated_admin_account.default](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/inspector2_delegated_admin_account) | resource |
 | [aws_organizations_account.default](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/organizations_account) | resource |
 | [aws_organizations_delegated_administrator.default](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/organizations_delegated_administrator) | resource |
 | [aws_organizations_organization.default](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/organizations_organization) | resource |
@@ -210,4 +208,3 @@ Checkout our other :point\_right: [terraform modules](https://registry.terraform
 ## Copyright
 
 Copyright © 2017-2023 [Blackbird Cloud](https://www.blackbird.cloud)
-<!-- END_TF_DOCS -->

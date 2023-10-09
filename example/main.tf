@@ -93,8 +93,6 @@ module "organization" {
   organizations_policies = {}
   # https://docs.aws.amazon.com/organizations/latest/userguide/orgs_integrate_services_list.html
 
-  #   securityhub_auto_enable = true
-
   primary_contact = {
     address_line_1  = "My address"
     address_line_2  = "My office unit"
