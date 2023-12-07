@@ -119,7 +119,7 @@ resource "aws_organizations_policy" "default" {
   content      = each.value.content
   description  = try(each.value.description, null)
   skip_destroy = try(each.value.skip_destroy, null)
-  type         = try(each.value.skip_destroy, "SERVICE_CONTROL_POLICY")
+  type         = try(each.value.type, "SERVICE_CONTROL_POLICY")
   tags         = var.tags
   depends_on   = [aws_organizations_organization.default]
 }
