@@ -62,8 +62,10 @@ locals {
   organizations_policy_attachments = flatten([
     for name, policy in var.organizations_policies : [
       for ou in policy.ous : {
-        target_id : ou == "root" ? aws_organizations_organization.default.roots[0].id : local.ous[ou]
-        policy_id : aws_organizations_policy.default[name]
+        ou          = ou
+        policy_name = name
+        # target_id : ou == "root" ? aws_organizations_organization.default.roots[0].id : local.ous[ou].id
+        # policy_id : aws_organizations_policy.default[name].id
       }
     ]
   ])
@@ -126,12 +128,12 @@ resource "aws_organizations_policy" "default" {
 
 resource "aws_organizations_policy_attachment" "default" {
   for_each = {
-    for attachment in local.organizations_policy_attachments : "${attachment.policy_id}-${attachment.target_id}" => attachment
+    for attachment in local.organizations_policy_attachments : "${attachment.policy_name}-${attachment.ou}" => attachment
   }
 
-  policy_id  = each.value.policy_id
-  target_id  = each.value.target_id
-  depends_on = [aws_organizations_organization.default]
+  policy_id  = aws_organizations_policy.default[each.value.policy_name].id
+  target_id  = each.value.ou == "root" ? aws_organizations_organization.default.roots[0].id : local.ous[each.value.ou].id
+  depends_on = [aws_organizations_organization.default, aws_organizations_policy.default]
 }
 
 ### Account Management
