@@ -253,11 +253,11 @@ resource "aws_securityhub_organization_admin_account" "default" {
 
 ### GuardDuty organization settings
 resource "aws_guardduty_detector" "default" {
-  count = contains(local.delegated_service_principals, "guardduty.amazonaws.com") != "" ? 1 : 0
+  count = contains(local.delegated_service_principals, "guardduty.amazonaws.com") ? 1 : 0
 }
 
 resource "aws_guardduty_organization_admin_account" "default" {
-  count = contains(local.delegated_service_principals, "guardduty.amazonaws.com") != "" ? 1 : 0
+  count = contains(local.delegated_service_principals, "guardduty.amazonaws.com") ? 1 : 0
 
   admin_account_id = aws_organizations_delegated_administrator.default["guardduty.amazonaws.com"].account_id
   depends_on       = [aws_organizations_organization.default, aws_guardduty_detector.default[0]]
