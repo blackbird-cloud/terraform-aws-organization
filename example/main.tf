@@ -1,129 +1,104 @@
 module "organization" {
-  source  = "blackbird-cloud/organization/aws"
-  version = "~> 2"
+  source  = "../modules/organization"
+  version = "~> 3"
 
   aws_service_access_principals = [
-    "sso.amazonaws.com",
-    "backup.amazonaws.com",
-    "securityhub.amazonaws.com",
-    "guardduty.amazonaws.com",
-    "inspector2.amazonaws.com",
-    "aws-artifact-account-sync.amazonaws.com",
-    "health.amazonaws.com",
-    "member.org.stacksets.cloudformation.amazonaws.com",
-    "cloudtrail.amazonaws.com",
-    "config.amazonaws.com",
-    "ram.amazonaws.com",
-    "reporting.trustedadvisor.amazonaws.com",
-    "servicequotas.amazonaws.com",
+    "access-analyzer.amazonaws.com",
     "account.amazonaws.com",
-    "config-multiaccountsetup.amazonaws.com",
-    "malware-protection.guardduty.amazonaws.com"
+    "cloudtrail.amazonaws.com",
+    "member.org.stacksets.cloudformation.amazonaws.com",
+    "sso.amazonaws.com"
   ]
-  feature_set = "ALL"
-  organizational_units = [
-    {
-      name     = "workloads"
-      accounts = []
-      tags     = {}
-      organizational_units = [
-        {
-          name                 = "develop"
-          organizational_units = []
-          accounts             = []
-          tags                 = {}
-        },
-        {
-          name                 = "production"
-          organizational_units = []
-          accounts             = []
-          tags                 = {}
-        }
-      ],
-    },
-    {
-      name                 = "infrastructure"
-      organizational_units = []
-      tags                 = {}
-      accounts = [
-        {
-          name                             = "monitoring"
-          email                            = "info+monitoring@website.com"
-          delegated_administrator_services = []
-        },
-      ]
-    },
-    {
-      name                 = "networking"
-      organizational_units = []
-      tags                 = {}
-      accounts = [
-        {
-          name                             = "networking"
-          email                            = "info+networking@website.com"
-          delegated_administrator_services = []
-        },
-      ]
-    },
-    {
-      name                 = "security"
-      organizational_units = []
-      tags                 = {}
-      accounts = [
-        {
-          name  = "tools"
-          email = "info+security-tools@website.com"
-          delegated_administrator_services = [
-            "config.amazonaws.com",
-            "guardduty.amazonaws.com",
-            "inspector2.amazonaws.com",
-            "securityhub.amazonaws.com",
-            "config-multiaccountsetup.amazonaws.com"
-          ]
-        },
-        {
-          name                             = "logs"
-          email                            = "info+security-logs@website.com"
-          delegated_administrator_services = ["backup.amazonaws.com"]
-        }
-      ]
-    },
-  ]
-
-  organizations_policies = {}
-  # https://docs.aws.amazon.com/organizations/latest/userguide/orgs_integrate_services_list.html
+  enabled_policy_types = ["BACKUP_POLICY", "SERVICE_CONTROL_POLICY", "TAG_POLICY"]
+  feature_set          = "ALL"
 
   primary_contact = {
-    address_line_1  = "My address"
-    address_line_2  = "My office unit"
-    city            = "Amsterdam"
-    company_name    = "My company"
-    country_code    = "NL"
-    postal_code     = "1234AB"
-    state_or_region = "Noord-Holland"
-    phone_number    = "+316XXXXXXXX"
-    website_url     = "https://www.website.com"
-    full_name       = "Jane Doe"
+    address_line_1  = "123 Main St"
+    city            = "Anytown"
+    country_code    = "US"
+    full_name       = "John Doe"
+    phone_number    = "+1-555-555-5555"
+    postal_code     = "12345"
+    state_or_region = "WA"
   }
 
   billing_contact = {
     name          = "Jane Doe"
-    title         = "Co-founder"
-    email_address = "info@website.com"
-    phone_number  = "+316XXXXXXXX"
-  }
-
-  security_contact = {
-    name          = "Jane Doe"
-    title         = "Co-founder"
-    email_address = "info@website.com"
-    phone_number  = "+316XXXXXXXX"
+    title         = "Billing"
+    email_address = "billing@example.com"
   }
 
   operations_contact = {
     name          = "Jane Doe"
-    title         = "Co-founder"
-    email_address = "info@website.com"
-    phone_number  = "+316XXXXXXXX"
+    title         = "Operations"
+    email_address = "ops@example.com"
+  }
+
+  security_contact = {
+    name          = "Jane Doe"
+    title         = "Security"
+    email_address = "security@example.com"
+  }
+}
+
+module "organization_units" {
+  source  = "../modules/organization-units"
+  version = "~> 3"
+
+  organizations_units = {
+    "Development" = {
+      parent_id = module.organization.organization_root_id
+    }
+    "Operations" = {
+      parent_id = module.organization.organization_root_id
+    }
+    "Security" = {
+      parent_id = module.organization.organization_root_id
+    }
+  }
+}
+
+module "accounts" {
+  source  = "../modules/accounts"
+  version = "~> 3"
+
+  contacts = dependency.org.outputs.contacts
+  accounts = {
+    keys = {
+      email                            = "keys@example.com"
+      delegated_administrator_services = []
+      parent_id                        = dependency.ous.outputs.ous["security"].id
+    }
+    logs = {
+      email                            = "logs@example.com"
+      delegated_administrator_services = []
+      parent_id                        = dependency.ous.outputs.ous["security"].id
+    }
+  }
+}
+
+module "org_policies" {
+  source  = "../modules/org-policies"
+  version = "~> 3"
+
+  organizations_policies = {
+    "BackupPolicy" = {
+      description = "Backup policy"
+      policy      = file("${path.module}/policies/backup_policy.json")
+      target_id   = module.organization.organization_root_id
+      type        = "BACKUP_POLICY"
+    }
+    "ServiceControlPolicy" = {
+      description = "Service control policy"
+      policy      = file("${path.module}/policies/service_control_policy.json")
+      target_id   = module.organization.organization_root_id
+      type        = "SERVICE_CONTROL_POLICY"
+    }
+    "TagPolicy" = {
+      description = "Tag policy"
+      policy      = file("${path.module}/policies/tag_policy.json")
+      target_id   = module.organization.organization_root_id
+      type        = "TAG_POLICY"
+    }
   }
 }

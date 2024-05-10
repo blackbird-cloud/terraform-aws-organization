@@ -46,32 +46,4 @@ variable "contacts" {
       phone_number  = optional(string)
     })
   })
-  default = {
-    primary_contact = {
-      address_line_1 = "henk"
-      city           = "Amsterdam"
-      country_code   = "NL"
-      full_name      = "Henk"
-      phone_number   = "+31612345678"
-      postal_code    = "1234AB"
-    }
-    operations_contact = {
-      name          = "Henk"
-      title         = "Operations"
-      email_address = "henk@henk.com"
-      phone_number  = "+31612345678"
-    }
-    billing_contact = {
-      name          = "Henk"
-      title         = "Billing"
-      email_address = "henk@henk.com"
-      phone_number  = "+31612345678"
-    }
-    security_contact = {
-      name          = "Henk"
-      title         = "Security"
-      email_address = "henk@henk.com"
-      phone_number  = "+31612345678"
-    }
-  }
 }

@@ -19,14 +19,14 @@ content: |-
 
   {{ .Header }}
 
-  ## Example
-  ```hcl
-  {{ include "./example/main.tf" }}
-  ```
+  {{ .Requirements }}
 
-  {{ include "./modules/accounts/README.md" }}
-  {{ include "./modules/organization/README.md" }}
-  {{ include "./modules/organization-policy/README.md" }}
-  {{ include "./modules/organizational-units/README.md" }}
+  {{ .Providers }}
+
+  {{ .Resources }}
+
+  {{ .Inputs }}
+
+  {{ .Outputs }}
 
   {{ .Footer }}
