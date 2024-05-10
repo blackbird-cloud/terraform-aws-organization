@@ -12,3 +12,8 @@ output "organization_root_id" {
   description = "The ID of the organization root"
   value       = aws_organizations_organization.default.roots[0].id
 }
+
+output "organization_id" {
+  description = "The ID of the organization"
+  value       = aws_organizations_organization.default.id
+}
