@@ -11,15 +11,15 @@ resource "aws_organizations_account" "default" {
 
 locals {
   delegated_administrators = flatten([
-    for account in var.accounts : [
-      for service in account.delegated_administrator_services : { service_principal : service, account_name : account.name }
+    for account_name, account in var.accounts : [
+      for service in account.delegated_administrator_services : { service_principal : service, account_name : account_name }
     ]
   ])
 }
 
 resource "aws_organizations_delegated_administrator" "default" {
   for_each = {
-    for account in local.delegated_administrators : account.service_principal => account
+    for delegated_administrator in local.delegated_administrators : "${delegated_administrator.account_name}-${delegated_administrator.service_principal}" => delegated_administrator
   }
 
   account_id        = aws_organizations_account.default[each.value.account_name].id
