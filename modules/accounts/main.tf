@@ -5,7 +5,7 @@ resource "aws_organizations_account" "default" {
   email                      = each.value.email
   close_on_deletion          = try(each.value.close_on_deletion, null)
   iam_user_access_to_billing = try(each.value.iam_user_access_to_billing, null)
-  tags                       = merge(each.value.tags, try(each.value.tags, {}))
+  tags                       = merge(each.value.tags, var.tags)
   parent_id                  = try(each.value.parent_id, null)
 }
 
