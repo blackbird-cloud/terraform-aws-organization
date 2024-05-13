@@ -28,6 +28,36 @@ resource "aws_organizations_delegated_administrator" "default" {
   depends_on = [aws_organizations_account.default]
 }
 
+### Securityhub organization settings
+resource "aws_securityhub_organization_admin_account" "default" {
+  for_each = {
+    for delegated_administrator in local.delegated_administrators : delegated_administrator.account_name => delegated_administrator if delegated_administrator.service_principal == "securityhub.amazonaws.com"
+  }
+  admin_account_id = aws_organizations_account.default[each.value.account_name].id
+}
+
+### GuardDuty organization settings
+resource "aws_guardduty_detector" "default" {
+  for_each = {
+    for delegated_administrator in local.delegated_administrators : delegated_administrator.account_name => delegated_administrator if delegated_administrator.service_principal == "guardduty.amazonaws.com"
+  }
+}
+
+resource "aws_guardduty_organization_admin_account" "default" {
+  for_each = {
+    for delegated_administrator in local.delegated_administrators : delegated_administrator.account_name => delegated_administrator if delegated_administrator.service_principal == "guardduty.amazonaws.com"
+  }
+  admin_account_id = aws_organizations_account.default[each.value.account_name].id
+  depends_on       = [aws_guardduty_detector.default[0]]
+}
+
+### Inspector organization settings
+resource "aws_inspector2_delegated_admin_account" "default" {
+  for_each = {
+    for delegated_administrator in local.delegated_administrators : delegated_administrator.account_name => delegated_administrator if delegated_administrator.service_principal == "inspector2.amazonaws.com"
+  }
+  account_id = aws_organizations_account.default[each.value.account_name].id
+}
 
 ### Account Management
 resource "aws_account_primary_contact" "default" {
