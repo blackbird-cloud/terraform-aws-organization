@@ -33,3 +33,8 @@ variable "operations_contact" {
   type        = any
   description = "email_address - (Required) An email address for the alternate contact. name - (Required) Name of the alternate contact. phone_number - (Required) Phone number for the alternate contact. title - (Required) Title for the alternate contact."
 }
+
+variable "aws_ram_sharing_with_organization" {
+  type        = bool
+  description = "(Optional) Enable sharing with AWS RAM. This allows you to share resources across accounts in your organization."
+}

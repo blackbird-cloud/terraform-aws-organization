@@ -45,3 +45,8 @@ resource "aws_account_alternate_contact" "root_security" {
   email_address = var.security_contact.email_address
   phone_number  = try(var.security_contact.phone_number, var.primary_contact.phone_number)
 }
+
+### RAM organization settings
+resource "aws_ram_sharing_with_organization" "default" {
+  count = var.aws_ram_sharing_with_organization ? 1 : 0
+}
