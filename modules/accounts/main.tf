@@ -59,6 +59,14 @@ resource "aws_inspector2_delegated_admin_account" "default" {
   account_id = aws_organizations_account.default[each.value.account_name].id
 }
 
+### IPAM organization settings
+resource "aws_vpc_ipam_organization_admin_account" "example" {
+  for_each = {
+    for delegated_administrator in local.delegated_administrators : delegated_administrator.account_name => delegated_administrator if delegated_administrator.service_principal == "ipam.amazonaws.com"
+  }
+  delegated_admin_account_id = aws_organizations_account.default[each.value.account_name].id
+}
+
 ### Account Management
 resource "aws_account_primary_contact" "default" {
   for_each = var.accounts
