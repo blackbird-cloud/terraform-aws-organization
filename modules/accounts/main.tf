@@ -4,7 +4,7 @@ resource "aws_organizations_account" "default" {
   name                       = each.key
   email                      = each.value.email
   close_on_deletion          = try(each.value.close_on_deletion, null)
-  iam_user_access_to_billing = try(each.value.iam_user_access_to_billing, null)
+  iam_user_access_to_billing = each.value.iam_user_access_to_billing == null ? "ALLOW" : each.value.iam_user_access_to_billing
   tags                       = merge(each.value.tags, var.tags)
   parent_id                  = try(each.value.parent_id, null)
 }
