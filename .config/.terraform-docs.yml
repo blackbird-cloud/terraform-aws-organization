@@ -14,8 +14,7 @@ sections:
     - modules
 
 content: |-
-  # AWS Organizations Terraform module
-  A Terraform module which configures your AWS Organization and creates AWS accounts. Read [this](https://docs.aws.amazon.com/organizations/index.html) page for more information, and for a secure reference architecture by AWS, read [this](https://docs.aws.amazon.com/prescriptive-guidance/latest/security-reference-architecture/welcome.html) page.
+  {{ include "./.config/title.md"}}
 
   {{ .Header }}
 
@@ -24,9 +23,14 @@ content: |-
   {{ include "./example/main.tf" }}
   ```
 
-  {{ include "./modules/accounts/README.md" }}
-  {{ include "./modules/organization/README.md" }}
-  {{ include "./modules/organization-policy/README.md" }}
-  {{ include "./modules/organizational-units/README.md" }}
+  {{ .Requirements }}
+
+  {{ .Providers }}
+
+  {{ .Resources }}
+
+  {{ .Inputs }}
+
+  {{ .Outputs }}
 
   {{ .Footer }}

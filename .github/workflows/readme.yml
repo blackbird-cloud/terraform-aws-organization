@@ -1,18 +1,28 @@
-name: Generate terraform docs
+name: Generate Readme
+
 on:
-  - pull_request
+  push:
+    branches:
+      - main
+  workflow_dispatch:
 
 jobs:
-  docs:
+  generate-readme:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/create-github-app-token@v1
+        id: app-token
         with:
-          ref: ${{ github.event.pull_request.head.ref }}
-
+          app-id: ${{ vars.BB_REPO_MANAGER_APP_ID }}
+          private-key: ${{ secrets.BB_REPO_MANAGER_SECRET }}
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ steps.app-token.outputs.token }}
       - name: Render terraform docs and push changes back to PR
         uses: terraform-docs/gh-actions@main
         with:
           working-dir: .
+          config-file: .config/.terraform-docs.yml
           git-push: "true"
           output-method: replace
+  

@@ -1,8 +1,9 @@
 name: Validate and Format
-# on: push
+
 on:
-  pull_request_target:
-    types: [opened, synchronize]
+  workflow_dispatch:
+  # pull_request_target:
+  #   types: [opened, synchronize]
 
 jobs:
   format:
@@ -11,7 +12,7 @@ jobs:
     container: blackbirdcloud/terraform-toolkit:latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: ${{ github.event.pull_request.head.repo.full_name }}
           ref: ${{ github.event.pull_request.head.ref }}
