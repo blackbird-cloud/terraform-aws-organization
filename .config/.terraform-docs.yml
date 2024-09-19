@@ -1,0 +1,28 @@
+formatter: "markdown"
+
+header-from: ./.config/header.md
+footer-from: ./.config/footer.md
+
+output:
+  file: ./README.md
+  mode: replace
+  template: |-
+    {{ .Content }}
+
+sections:
+  hide:
+    - modules
+
+content: |-
+  {{ include "./.config/title.md"}}
+
+  {{ .Header }}
+
+  ## Example
+  ```hcl
+  {{ include "./example/main.tf" }}
+  ```
+
+  {{ include "./.config/modules.md"}}
+
+  {{ .Footer }}
