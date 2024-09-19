@@ -112,25 +112,12 @@ module "org_policies" {
 }
 ```
 
-## Requirements
+## Modules
 
-No requirements.
-
-## Providers
-
-No providers.
-
-## Resources
-
-No resources.
-
-## Inputs
-
-No inputs.
-
-## Outputs
-
-No outputs.
+- [Accounts](./modules/accounts/README.md)
+- [Organization](./modules/organization/README.md)
+- [Organization Policy](./modules/organization-policy/README.md)
+- [Organizational Units](./modules/organizational-units/README.md)
 
 ## About
 
