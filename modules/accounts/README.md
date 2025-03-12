@@ -14,7 +14,7 @@ A Terraform module which configures your AWS Organization and creates AWS accoun
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 5.49.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | ~> 5 |
 
 ## Resources
 
@@ -24,15 +24,21 @@ A Terraform module which configures your AWS Organization and creates AWS accoun
 | [aws_account_alternate_contact.operations](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/account_alternate_contact) | resource |
 | [aws_account_alternate_contact.security](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/account_alternate_contact) | resource |
 | [aws_account_primary_contact.default](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/account_primary_contact) | resource |
+| [aws_guardduty_detector.default](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/guardduty_detector) | resource |
+| [aws_guardduty_organization_admin_account.default](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/guardduty_organization_admin_account) | resource |
+| [aws_inspector2_delegated_admin_account.default](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/inspector2_delegated_admin_account) | resource |
 | [aws_organizations_account.default](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/organizations_account) | resource |
 | [aws_organizations_delegated_administrator.default](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/organizations_delegated_administrator) | resource |
+| [aws_securityhub_organization_admin_account.default](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/securityhub_organization_admin_account) | resource |
+| [aws_vpc_ipam_organization_admin_account.example](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_ipam_organization_admin_account) | resource |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_accounts"></a> [accounts](#input\_accounts) | List of AWS accounts to create | <pre>map(object({<br>    email                            = string<br>    close_on_deletion                = optional(bool)<br>    iam_user_access_to_billing       = optional(bool)<br>    delegated_administrator_services = list(string)<br>    tags                             = optional(map(string))<br>    parent_id                        = optional(string)<br>  }))</pre> | n/a | yes |
+| <a name="input_accounts"></a> [accounts](#input\_accounts) | List of AWS accounts to create | <pre>map(object({<br>    email                            = string<br>    close_on_deletion                = optional(bool)<br>    iam_user_access_to_billing       = optional(string)<br>    delegated_administrator_services = list(string)<br>    tags                             = optional(map(string))<br>    parent_id                        = optional(string)<br>  }))</pre> | n/a | yes |
 | <a name="input_contacts"></a> [contacts](#input\_contacts) | Primary and alternate contacts for the accounts | <pre>object({<br>    primary_contact = object({<br>      address_line_1     = string<br>      address_line_2     = optional(string)<br>      address_line_3     = optional(string)<br>      city               = string<br>      company_name       = optional(string)<br>      country_code       = string<br>      district_or_county = optional(string)<br>      full_name          = string<br>      phone_number       = string<br>      postal_code        = string<br>      state_or_region    = optional(string)<br>      website_url        = optional(string)<br>    })<br>    operations_contact = object({<br>      name          = string<br>      title         = string<br>      email_address = string<br>      phone_number  = optional(string)<br>    })<br>    billing_contact = object({<br>      name          = string<br>      title         = string<br>      email_address = string<br>      phone_number  = optional(string)<br>    })<br>    security_contact = object({<br>      name          = string<br>      title         = string<br>      email_address = string<br>      phone_number  = optional(string)<br>    })<br>  })</pre> | n/a | yes |
+| <a name="input_tags"></a> [tags](#input\_tags) | A map of tags to add to the resources | `map(string)` | n/a | yes |
 
 ## Outputs
 

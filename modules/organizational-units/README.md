@@ -15,7 +15,7 @@ A Terraform module which configures your AWS Organization and creates AWS accoun
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 5.49.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | ~> 5 |
 
 ## Resources
 
@@ -27,7 +27,7 @@ A Terraform module which configures your AWS Organization and creates AWS accoun
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_organization_units"></a> [organization\_units](#input\_organization\_units) | List of organizational units to create | <pre>map(object(<br>    {<br>      name      = string<br>      parent_id = string<br>      tags      = optional(map(string))<br>    }<br>  ))</pre> | n/a | yes |
+| <a name="input_organization_units"></a> [organization\_units](#input\_organization\_units) | List of organizational units to create | <pre>map(object(<br>    {<br>      parent_id = string<br>      tags      = optional(map(string))<br>    }<br>  ))</pre> | n/a | yes |
 
 ## Outputs
 
