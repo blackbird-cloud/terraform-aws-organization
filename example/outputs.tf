@@ -1,24 +1,29 @@
-output "accounts" {
-  value       = module.organization.accounts
-  description = "All AWS accounts."
+output "organization_id" {
+  value       = module.organization.organization_id
+  description = "The ID of the AWS Organization."
+}
+
+output "organization_root_id" {
+  value       = module.organization.organization_root_id
+  description = "The ID of the AWS Organization root."
 }
 
 output "organizational_units" {
-  value       = module.organization.organizational_units
-  description = "All AWS Organizational Units."
+  value       = module.organization_units.ous
+  description = "The created AWS Organizational Units."
 }
 
-output "organization" {
-  value       = module.organization.organization
-  description = "The AWS Organization"
+output "accounts" {
+  value       = module.accounts.accounts
+  description = "The created AWS accounts."
+}
+
+output "delegated_administrators" {
+  value       = module.accounts.delegated_administrators
+  description = "The AWS Organization delegated administrator registrations."
 }
 
 output "organizations_policies" {
-  value       = module.organization.organizations_policies
-  description = "The created Organization policies."
-}
-
-output "organizations_delegated_administrator" {
-  value       = module.organization.organizations_delegated_administrator
-  description = "The AWS Organization delegated administrator assignments."
+  value       = module.org_policies.policies
+  description = "The created AWS Organization policies."
 }

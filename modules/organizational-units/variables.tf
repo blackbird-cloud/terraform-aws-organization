@@ -1,10 +1,8 @@
 variable "organization_units" {
-  description = "List of organizational units to create"
-  type = map(object(
-    {
-      name      = string
-      parent_id = string
-      tags      = optional(map(string))
-    }
-  ))
+  description = "Map of organizational units to create. The map key is used as the OU name unless `name` is set explicitly."
+  type = map(object({
+    parent_id = string
+    name      = optional(string)
+    tags      = optional(map(string), {})
+  }))
 }

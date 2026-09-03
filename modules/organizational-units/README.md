@@ -7,32 +7,32 @@ A Terraform module which configures your AWS Organization and creates AWS accoun
 ## Requirements
 
 | Name | Version |
-|------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | ~> 5 |
+| ---- | ------- |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.5.0 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | ~> 6.0 |
 
 ## Providers
 
 | Name | Version |
-|------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 5.49.0 |
+| ---- | ------- |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 6.52.0 |
 
 ## Resources
 
 | Name | Type |
-|------|------|
+| ---- | ---- |
 | [aws_organizations_organizational_unit.default](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/organizations_organizational_unit) | resource |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
-| <a name="input_organization_units"></a> [organization\_units](#input\_organization\_units) | List of organizational units to create | <pre>map(object(<br>    {<br>      name      = string<br>      parent_id = string<br>      tags      = optional(map(string))<br>    }<br>  ))</pre> | n/a | yes |
+| ---- | ----------- | ---- | ------- | :------: |
+| <a name="input_organization_units"></a> [organization\_units](#input\_organization\_units) | Map of organizational units to create. The map key is used as the OU name unless `name` is set explicitly. | <pre>map(object({<br/>    parent_id = string<br/>    name      = optional(string)<br/>    tags      = optional(map(string), {})<br/>  }))</pre> | n/a | yes |
 
 ## Outputs
 
 | Name | Description |
-|------|-------------|
+| ---- | ----------- |
 | <a name="output_ous"></a> [ous](#output\_ous) | The organizational units for the organization |
 
 ## About

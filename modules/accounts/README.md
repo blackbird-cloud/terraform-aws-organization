@@ -6,39 +6,46 @@ A Terraform module which configures your AWS Organization and creates AWS accoun
 ## Requirements
 
 | Name | Version |
-|------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | ~> 5 |
+| ---- | ------- |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.5.0 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | ~> 6.0 |
 
 ## Providers
 
 | Name | Version |
-|------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 5.49.0 |
+| ---- | ------- |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 6.52.0 |
 
 ## Resources
 
 | Name | Type |
-|------|------|
+| ---- | ---- |
 | [aws_account_alternate_contact.billing](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/account_alternate_contact) | resource |
 | [aws_account_alternate_contact.operations](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/account_alternate_contact) | resource |
 | [aws_account_alternate_contact.security](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/account_alternate_contact) | resource |
 | [aws_account_primary_contact.default](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/account_primary_contact) | resource |
+| [aws_guardduty_detector.default](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/guardduty_detector) | resource |
+| [aws_guardduty_organization_admin_account.default](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/guardduty_organization_admin_account) | resource |
+| [aws_inspector2_delegated_admin_account.default](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/inspector2_delegated_admin_account) | resource |
 | [aws_organizations_account.default](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/organizations_account) | resource |
 | [aws_organizations_delegated_administrator.default](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/organizations_delegated_administrator) | resource |
+| [aws_securityhub_organization_admin_account.default](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/securityhub_organization_admin_account) | resource |
+| [aws_vpc_ipam_organization_admin_account.default](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_ipam_organization_admin_account) | resource |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
-| <a name="input_accounts"></a> [accounts](#input\_accounts) | List of AWS accounts to create | <pre>map(object({<br>    email                            = string<br>    close_on_deletion                = optional(bool)<br>    iam_user_access_to_billing       = optional(bool)<br>    delegated_administrator_services = list(string)<br>    tags                             = optional(map(string))<br>    parent_id                        = optional(string)<br>  }))</pre> | n/a | yes |
-| <a name="input_contacts"></a> [contacts](#input\_contacts) | Primary and alternate contacts for the accounts | <pre>object({<br>    primary_contact = object({<br>      address_line_1     = string<br>      address_line_2     = optional(string)<br>      address_line_3     = optional(string)<br>      city               = string<br>      company_name       = optional(string)<br>      country_code       = string<br>      district_or_county = optional(string)<br>      full_name          = string<br>      phone_number       = string<br>      postal_code        = string<br>      state_or_region    = optional(string)<br>      website_url        = optional(string)<br>    })<br>    operations_contact = object({<br>      name          = string<br>      title         = string<br>      email_address = string<br>      phone_number  = optional(string)<br>    })<br>    billing_contact = object({<br>      name          = string<br>      title         = string<br>      email_address = string<br>      phone_number  = optional(string)<br>    })<br>    security_contact = object({<br>      name          = string<br>      title         = string<br>      email_address = string<br>      phone_number  = optional(string)<br>    })<br>  })</pre> | n/a | yes |
+| ---- | ----------- | ---- | ------- | :------: |
+| <a name="input_accounts"></a> [accounts](#input\_accounts) | List of AWS accounts to create | <pre>map(object({<br/>    email                            = string<br/>    close_on_deletion                = optional(bool)<br/>    iam_user_access_to_billing       = optional(bool)<br/>    delegated_administrator_services = optional(list(string), [])<br/>    tags                             = optional(map(string), {})<br/>    parent_id                        = optional(string)<br/>  }))</pre> | n/a | yes |
+| <a name="input_contacts"></a> [contacts](#input\_contacts) | (Optional) Primary and alternate contacts to apply to every created account. Set to null to leave account contacts unmanaged by Terraform. Each alternate contact (operations/billing/security) can be omitted individually. | <pre>object({<br/>    primary_contact = object({<br/>      address_line_1     = string<br/>      address_line_2     = optional(string)<br/>      address_line_3     = optional(string)<br/>      city               = string<br/>      company_name       = optional(string)<br/>      country_code       = string<br/>      district_or_county = optional(string)<br/>      full_name          = string<br/>      phone_number       = string<br/>      postal_code        = string<br/>      state_or_region    = optional(string)<br/>      website_url        = optional(string)<br/>    })<br/>    operations_contact = optional(object({<br/>      name          = string<br/>      title         = string<br/>      email_address = string<br/>      phone_number  = optional(string)<br/>    }))<br/>    billing_contact = optional(object({<br/>      name          = string<br/>      title         = string<br/>      email_address = string<br/>      phone_number  = optional(string)<br/>    }))<br/>    security_contact = optional(object({<br/>      name          = string<br/>      title         = string<br/>      email_address = string<br/>      phone_number  = optional(string)<br/>    }))<br/>  })</pre> | `null` | no |
+| <a name="input_tags"></a> [tags](#input\_tags) | A map of tags to add to the created accounts | `map(string)` | `{}` | no |
 
 ## Outputs
 
 | Name | Description |
-|------|-------------|
-| <a name="output_accounts"></a> [accounts](#output\_accounts) | The accounts created |
+| ---- | ----------- |
+| <a name="output_accounts"></a> [accounts](#output\_accounts) | The created AWS accounts, keyed by account name (id, arn, name, email, parent\_id, state, joined\_method, joined\_timestamp, tags) |
+| <a name="output_delegated_administrators"></a> [delegated\_administrators](#output\_delegated\_administrators) | The Organizations delegated administrator registrations, keyed by "<account>-<service\_principal>" |
 
 ## About
 
