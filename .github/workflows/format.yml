@@ -20,13 +20,16 @@ jobs:
       - name: Configure git
         run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
 
+      # This repository has no root module: validate every submodule and the example.
       - name: Validate and Format
         env:
           TFENV_TERRAFORM_VERSION: latest-allowed
         run: |
-          terraform init -backend=false
-          terraform validate
-          terraform fmt
+          for dir in modules/*/ example/; do
+            echo "::group::$dir"
+            (cd "$dir" && terraform init -backend=false && terraform validate && terraform fmt)
+            echo "::endgroup::"
+          done
 
       - name: Commit and push
         uses: EndBug/add-and-commit@v9
