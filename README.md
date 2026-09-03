@@ -1,3 +1,4 @@
+<!-- BEGIN_TF_DOCS -->
 # Terraform Aws Organization Module
 Terraform module to create an AWS Organization
 
@@ -88,6 +89,19 @@ module "accounts" {
   }
 }
 
+provider "aws" {
+  alias  = "us_east_1"
+  region = "us-east-1"
+}
+
+# Firewall Manager administrator: AWS only accepts the association in us-east-1.
+module "fms_admin" {
+  source    = "../modules/fms-admin"
+  providers = { aws = aws.us_east_1 }
+
+  account_id = module.accounts.accounts["logs"].id
+}
+
 module "org_policies" {
   source = "../modules/organization-policy"
 
@@ -130,4 +144,5 @@ Checkout our other :point\_right: [terraform modules](https://registry.terraform
 
 ## Copyright
 
-Copyright © 2017-2024 [Blackbird Cloud](https://blackbird.cloud)
+Copyright © 2017-2025 [Blackbird Cloud](https://blackbird.cloud)
+<!-- END_TF_DOCS -->
