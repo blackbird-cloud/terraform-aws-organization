@@ -1,6 +1,7 @@
 variable "aws_service_access_principals" {
   type        = list(string)
   description = "(Optional) List of AWS service principal names for which you want to enable integration with your organization. This is typically in the form of a URL, such as service-abbreviation.amazonaws.com. Organization must have feature_set set to ALL. Some services do not support enablement via this endpoint, see warning in aws docs. https://docs.aws.amazon.com/organizations/latest/userguide/orgs_integrate_services_list.html"
+  default     = []
 }
 
 variable "enabled_policy_types" {
@@ -12,29 +13,68 @@ variable "enabled_policy_types" {
 variable "feature_set" {
   type        = string
   description = "(Optional) Specify \"ALL\" (default) or \"CONSOLIDATED_BILLING\"."
+  default     = "ALL"
+
+  validation {
+    condition     = contains(["ALL", "CONSOLIDATED_BILLING"], var.feature_set)
+    error_message = "feature_set must be one of \"ALL\" or \"CONSOLIDATED_BILLING\"."
+  }
 }
 
 variable "primary_contact" {
-  type        = any
-  description = "address_line_1 - (Required) The first line of the primary contact address. address_line_2 - (Optional) The second line of the primary contact address, if any. address_line_3 - (Optional) The third line of the primary contact address, if any. city - (Required) The city of the primary contact address. company_name - (Optional) The name of the company associated with the primary contact information, if any. country_code - (Required) The ISO-3166 two-letter country code for the primary contact address. district_or_county - (Optional) The district or county of the primary contact address, if any. full_name - (Required) The full name of the primary contact address. phone_number - (Required) The phone number of the primary contact information. The number will be validated and, in some countries, checked for activation. postal_code - (Required) The postal code of the primary contact address. state_or_region - (Optional) The state or region of the primary contact address. This field is required in selected countries. website_url - (Optional) The URL of the website associated with the primary contact information, if any."
-}
-
-variable "billing_contact" {
-  type        = any
-  description = "email_address - (Required) An email address for the alternate contact. name - (Required) Name of the alternate contact. phone_number - (Required) Phone number for the alternate contact. title - (Required) Title for the alternate contact."
-}
-
-variable "security_contact" {
-  type        = any
-  description = "email_address - (Required) An email address for the alternate contact. name - (Required) Name of the alternate contact. phone_number - (Required) Phone number for the alternate contact. title - (Required) Title for the alternate contact."
+  description = "(Optional) Primary contact information for the management account. Set to null to leave the contact unmanaged by Terraform."
+  default     = null
+  type = object({
+    address_line_1     = string
+    address_line_2     = optional(string)
+    address_line_3     = optional(string)
+    city               = string
+    company_name       = optional(string)
+    country_code       = string
+    district_or_county = optional(string)
+    full_name          = string
+    phone_number       = string
+    postal_code        = string
+    state_or_region    = optional(string)
+    website_url        = optional(string)
+  })
 }
 
 variable "operations_contact" {
-  type        = any
-  description = "email_address - (Required) An email address for the alternate contact. name - (Required) Name of the alternate contact. phone_number - (Required) Phone number for the alternate contact. title - (Required) Title for the alternate contact."
+  description = "(Optional) Operations alternate contact for the management account. Set to null to leave it unmanaged by Terraform."
+  default     = null
+  type = object({
+    name          = string
+    title         = string
+    email_address = string
+    phone_number  = optional(string)
+  })
+}
+
+variable "billing_contact" {
+  description = "(Optional) Billing alternate contact for the management account. Set to null to leave it unmanaged by Terraform."
+  default     = null
+  type = object({
+    name          = string
+    title         = string
+    email_address = string
+    phone_number  = optional(string)
+  })
+}
+
+variable "security_contact" {
+  description = "(Optional) Security alternate contact for the management account. Set to null to leave it unmanaged by Terraform."
+  default     = null
+  type = object({
+    name          = string
+    title         = string
+    email_address = string
+    phone_number  = optional(string)
+  })
 }
 
 variable "aws_ram_sharing_with_organization" {
   type        = bool
-  description = "(Optional) Enable sharing with AWS RAM. This allows you to share resources across accounts in your organization."
+  description = "(Optional) Enable resource sharing with AWS RAM across the organization. This allows you to share resources across accounts in your organization."
+  default     = false
 }

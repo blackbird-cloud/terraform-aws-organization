@@ -4,14 +4,15 @@ variable "accounts" {
     email                            = string
     close_on_deletion                = optional(bool)
     iam_user_access_to_billing       = optional(bool)
-    delegated_administrator_services = list(string)
-    tags                             = optional(map(string))
+    delegated_administrator_services = optional(list(string), [])
+    tags                             = optional(map(string), {})
     parent_id                        = optional(string)
   }))
 }
 
 variable "contacts" {
-  description = "Primary and alternate contacts for the accounts"
+  description = "(Optional) Primary and alternate contacts to apply to every created account. Set to null to leave account contacts unmanaged by Terraform. Each alternate contact (operations/billing/security) can be omitted individually."
+  default     = null
   type = object({
     primary_contact = object({
       address_line_1     = string
@@ -27,28 +28,29 @@ variable "contacts" {
       state_or_region    = optional(string)
       website_url        = optional(string)
     })
-    operations_contact = object({
+    operations_contact = optional(object({
       name          = string
       title         = string
       email_address = string
       phone_number  = optional(string)
-    })
-    billing_contact = object({
+    }))
+    billing_contact = optional(object({
       name          = string
       title         = string
       email_address = string
       phone_number  = optional(string)
-    })
-    security_contact = object({
+    }))
+    security_contact = optional(object({
       name          = string
       title         = string
       email_address = string
       phone_number  = optional(string)
-    })
+    }))
   })
 }
 
 variable "tags" {
-  description = "A map of tags to add to the resources"
+  description = "A map of tags to add to the created accounts"
   type        = map(string)
+  default     = {}
 }

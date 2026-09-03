@@ -26,7 +26,6 @@ resource "aws_organizations_policy_attachment" "default" {
     for attachment in local.organizations_policy_attachments : "${attachment.policy_name}-${attachment.ou}" => attachment
   }
 
-  policy_id  = aws_organizations_policy.default[each.value.policy_name].id
-  target_id  = each.value.ou
-  depends_on = [aws_organizations_policy.default]
+  policy_id = aws_organizations_policy.default[each.value.policy_name].id
+  target_id = each.value.ou
 }

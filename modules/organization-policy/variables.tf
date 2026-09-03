@@ -10,6 +10,7 @@ variable "organizations_policies" {
 }
 
 variable "tags" {
-  description = "A map of tags to add to the resources"
+  description = "A map of tags to add to the organization policies"
   type        = map(string)
+  default     = {}
 }

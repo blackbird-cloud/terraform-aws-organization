@@ -3,6 +3,21 @@ A Terraform module which configures your AWS Organization and creates AWS accoun
 
 [![blackbird-logo](https://raw.githubusercontent.com/blackbird-cloud/terraform-module-template/main/.config/logo_simple.png)](https://www.blackbird.cloud)
 
+Associates a member account as the AWS Firewall Manager administrator. AWS only accepts this call in `us-east-1`, so pass a provider configured for that region:
+
+```hcl
+provider "aws" {
+  alias  = "us_east_1"
+  region = "us-east-1"
+}
+
+module "fms_admin" {
+  source     = "../modules/fms-admin"
+  providers  = { aws = aws.us_east_1 }
+  account_id = module.accounts.accounts["network"].id
+}
+```
+
 ## Requirements
 
 | Name | Version |
@@ -14,27 +29,25 @@ A Terraform module which configures your AWS Organization and creates AWS accoun
 
 | Name | Version |
 | ---- | ------- |
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 6.52.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | ~> 6.0 |
 
 ## Resources
 
 | Name | Type |
 | ---- | ---- |
-| [aws_organizations_policy.default](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/organizations_policy) | resource |
-| [aws_organizations_policy_attachment.default](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/organizations_policy_attachment) | resource |
+| [aws_fms_admin_account.default](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/fms_admin_account) | resource |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 | ---- | ----------- | ---- | ------- | :------: |
-| <a name="input_organizations_policies"></a> [organizations\_policies](#input\_organizations\_policies) | A map of policies to attach to the organization | <pre>map(object({<br/>    content      = string<br/>    ous          = list(string)<br/>    description  = optional(string)<br/>    skip_destroy = optional(bool)<br/>    type         = optional(string)<br/>  }))</pre> | n/a | yes |
-| <a name="input_tags"></a> [tags](#input\_tags) | A map of tags to add to the organization policies | `map(string)` | `{}` | no |
+| <a name="input_account_id"></a> [account\_id](#input\_account\_id) | ID of the member account to associate as the Firewall Manager administrator. The account must already be a delegated administrator for fms.amazonaws.com. | `string` | n/a | yes |
 
 ## Outputs
 
 | Name | Description |
 | ---- | ----------- |
-| <a name="output_policies"></a> [policies](#output\_policies) | The policies for the organization |
+| <a name="output_admin_account"></a> [admin\_account](#output\_admin\_account) | The Firewall Manager administrator account association |
 
 ## About
 
